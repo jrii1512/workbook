@@ -4,6 +4,7 @@ import axios from "axios";
 import ExcelReader from "./ExcelReader";
 import writeToExcel from "./WriteToExcel";
 import { useWk } from "./hooks/utils";
+import "./App.css";
 
 function App() {
   /*<ExcelReader />*/
@@ -51,16 +52,23 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Excel generaattori</h1>
+      <h1 className="App-title">Ylityö kirjaus systeemi</h1>
 
-      <form onSubmit={handleExport}>
-        <label>File</label>
-        <input type="text" name="file" onChange={handleChange}></input>
+      <form className="App-form">
+        <input
+          className = "App-file"
+          type="text"
+          placeholder="Exporttava fileen nimi"
+          name="file"
+          onChange={handleChange}
+        ></input>
       </form>
 
-      <button onClick={handleExport}>Export</button>
+      <button className = "App-button"onClick={handleExport}>Export</button>
       <p></p>
-      <button onClick={testServer}>Server - test</button>
+      <button className="App-button" onClick={testServer}>
+        Server - test
+      </button>
     </div>
   );
 }
