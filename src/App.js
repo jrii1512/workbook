@@ -37,7 +37,7 @@ function App() {
   ];
 
   const handleExport = () => {
-    writeToExcel(arrData, file, wkNumber);
+    writeToExcel(arrData, file  + '.xlsx', wkNumber);
   };
 
   const handleChange = (event) => {
@@ -56,15 +56,34 @@ function App() {
 
       <form className="App-form">
         <input
-          className = "App-file"
+          className="App-file"
           type="text"
           placeholder="Exporttava fileen nimi"
+          name="file"
+          onChange={handleChange}
+          value = {file}
+        ></input>
+
+        <input
+          className="App-file2"
+          type="text"
+          placeholder="1. tavoite"
+          name="tavoite"
+          onChange={handleChange}
+        ></input>
+
+        <input
+          className="App-file3"
+          type="text"
+          placeholder="2. tavoite"
           name="file"
           onChange={handleChange}
         ></input>
       </form>
 
-      <button className = "App-button"onClick={handleExport}>Export</button>
+      <button className="App-button" onClick={handleExport}>
+        Export
+      </button>
       <p></p>
       <button className="App-button" onClick={testServer}>
         Server - test
