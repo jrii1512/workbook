@@ -5,16 +5,25 @@ import ExcelReader from "./ExcelReader";
 import writeToExcel from "./WriteToExcel";
 import { useWk } from "./hooks/utils";
 import "./App.css";
-import Button from "@mui/material/Button";
+
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { Button, TextField } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import moment from "moment";
+
 import { useConfirm } from "material-ui-confirm";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 function App() {
   /*<ExcelReader />*/
-  const [file, setFile] = useState("");
-  const [objective, setObjective] = useState("") 
-  const [secondObjective, setSecondObjective] = useState("")
-  const [alive, setAlive] = useState("")
+  const [file, setFile] = useState(null);
+  const [pvm, setPVM] = useState(null);
+  const [poikkeama, setPoikkeama] = useState(null);
+  const [selite, setSelite] = useState(null)
+  const [alive, setAlive] = useState("");
+
+  console.log("pvm:", pvm);
 
   const startDay = new Date().getDate();
   const month = new Date().getMonth() + 1;
@@ -24,13 +33,18 @@ function App() {
     [],
     [],
     ["Työtehtävät:"],
-    [
-      "Tukipyyntöjen selvittäminen",
-      "Asennukset & päivitykset",
-      "Dokumentointi",
-    ],
+    ["Tukipyyntöjen selvittäminen"],
+      ["Asennukset & päivitykset"],
+      ["Dokumentointi"],
+    
     [],
-    ["Viikko numero " + wkNumber],
+    [pvm],
+    [],
+    [poikkeama],
+    [],
+    [selite],
+  ]
+    /*
     [
       startDay + "." + month,
       new Date().getDate() + 1 + "." + month,
@@ -38,66 +52,98 @@ function App() {
       new Date().getDate() + 3 + "." + month,
       new Date().getDate() + 4 + "." + month,
     ],
-    [],
-    ["Poikkeama 7.5 tunnista: "],
-    [0, 0, 0, 0, 0],
-  ];
+    */
 
-  const confirm = useConfirm()
+  const confirm = useConfirm();
 
   const handleExport = () => {
-    writeToExcel(arrData, file + ".xlsx", wkNumber);
+    writeToExcel(arrData, file + ".xlsx");
   };
 
   const handleChange = (event) => {
-    console.log("filename:", event.target.value);
-    event.target.name === "file" ? setFile(event.target.value) : setFile("");
+    console.log(
+      "Component:",
+      event.target.name + ", value:",
+      event.target.value
+    );
+    if (event.target.name === "file") {
+      setFile(event.target.value);
+    } else if (event.target.name === "poikkeama") {
+      setPoikkeama(event.target.value);
+    }
+    else if (event.target.name === "selite") {
+      setSelite(event.target.value);
+    }
   };
 
   const testServer = async () => {
     const response = await axios.get("http://localhost:3001/alive");
     console.log(response.data);
-    setAlive(response.data)
+    setAlive(response.data);
   };
 
   const onDialogClosed = () => {
-    setAlive("")
-  }
+    setAlive("");
+  };
+
+  const handleChangeDate = (date) => {
+    const newDate = moment().format("MM/DD/YYYY");
+    console.log("tanaan: ", newDate);
+    setPVM(newDate);
+  };
 
   return (
     <div className="App">
-
       <h1 className="App-title">Ylityö kirjaus systeemi</h1>
 
       <form className="App-form">
-        <input
-          type="text"
-          placeholder="Exporttava fileen nimi"
-          name="file"
-          onChange={handleChange}
-          value={file}
-        ></input>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <DatePicker label="PVM" onChange={handleChangeDate} />
+        </LocalizationProvider>
 
-        <input
-          type="text"
-          placeholder="1. tavoite"
-          name="tavoite"
+        <TextField
+          id="outlined-basic"
+          label="Poikkeama tunnit"
+          variant="outlined"
+          value={poikkeama}
+          name="poikkeama"
           onChange={handleChange}
-        ></input>
+        />
 
-        <input
-          type="text"
-          placeholder="2. tavoite"
-          name="file"
+<TextField
+          id="outlined-basic"
+          label="Selite"
+          variant="outlined"
+          value={selite}
+          name="selite"
+          multiline
+          maxRows={5}
           onChange={handleChange}
-        ></input>
+        />
+
+
+
+        <TextField
+          id="outlined-basic"
+          label="File"
+          variant="outlined"
+          name="file"
+          value={'Vk ' + wkNumber + '-' + pvm + '-poikkeama'} 
+          onChange={handleChange}
+        />
 
         <div className="App-button">
-          <Button onClick={handleExport}>Export</Button>
+          <Button onClick={handleExport}>Vie exceliin</Button>
           <Button onClick={testServer}>Server - test</Button>
         </div>
       </form>
-      {alive && <ConfirmationDialog data = {alive} title = "Alive" onClose={() => onDialogClosed()}/>}
+      {alive && (
+        <ConfirmationDialog
+          data={alive}
+          title="Alive"
+          onClose={() => onDialogClosed()}
+        />
+      )}
     </div>
   );
 }
