@@ -5,10 +5,17 @@ import ExcelReader from "./ExcelReader";
 import writeToExcel from "./WriteToExcel";
 import { useWk } from "./hooks/utils";
 import "./App.css";
+import Button from "@mui/material/Button";
+import { useConfirm } from "material-ui-confirm";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 function App() {
   /*<ExcelReader />*/
   const [file, setFile] = useState("");
+  const [objective, setObjective] = useState("") 
+  const [secondObjective, setSecondObjective] = useState("")
+  const [alive, setAlive] = useState("")
+
   const startDay = new Date().getDate();
   const month = new Date().getMonth() + 1;
   const wkNumber = useWk();
@@ -36,36 +43,42 @@ function App() {
     [0, 0, 0, 0, 0],
   ];
 
+  const confirm = useConfirm()
+
   const handleExport = () => {
-    writeToExcel(arrData, file  + '.xlsx', wkNumber);
+    writeToExcel(arrData, file + ".xlsx", wkNumber);
   };
 
   const handleChange = (event) => {
     console.log("filename:", event.target.value);
-    setFile(event.target.value);
+    event.target.name === "file" ? setFile(event.target.value) : setFile("");
   };
 
   const testServer = async () => {
     const response = await axios.get("http://localhost:3001/alive");
-    console.log(response);
+    console.log(response.data);
+    setAlive(response.data)
   };
+
+  const onDialogClosed = () => {
+    setAlive("")
+  }
 
   return (
     <div className="App">
+
       <h1 className="App-title">Ylityö kirjaus systeemi</h1>
 
       <form className="App-form">
         <input
-          className="App-file"
           type="text"
           placeholder="Exporttava fileen nimi"
           name="file"
           onChange={handleChange}
-          value = {file}
+          value={file}
         ></input>
 
         <input
-          className="App-file2"
           type="text"
           placeholder="1. tavoite"
           name="tavoite"
@@ -73,21 +86,18 @@ function App() {
         ></input>
 
         <input
-          className="App-file3"
           type="text"
           placeholder="2. tavoite"
           name="file"
           onChange={handleChange}
         ></input>
-      </form>
 
-      <button className="App-button" onClick={handleExport}>
-        Export
-      </button>
-      <p></p>
-      <button className="App-button" onClick={testServer}>
-        Server - test
-      </button>
+        <div className="App-button">
+          <Button onClick={handleExport}>Export</Button>
+          <Button onClick={testServer}>Server - test</Button>
+        </div>
+      </form>
+      {alive && <ConfirmationDialog data = {alive} title = "Alive" onClose={() => onDialogClosed()}/>}
     </div>
   );
 }
