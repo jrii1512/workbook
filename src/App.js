@@ -8,7 +8,7 @@ import "./App.css";
 
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Button, TextField } from "@mui/material";
+import { Button, TextField, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import moment from "moment";
 
@@ -36,11 +36,11 @@ function App() {
         },
       })
       .then((response) => {
-        console.log("response: ", response)
+        console.log("response: ", response);
         if (response.status !== 200) {
           throw new Error("Network response was not ok");
         }
-        setSaldo(parseInt(response.data));        
+        setSaldo(parseInt(response.data));
       });
   }, []);
 
@@ -55,11 +55,26 @@ function App() {
   ];
 
   const confirm = useConfirm();
-
   const handleExport = () => {
     let paiva = new Date().getDate();
     file = "Vk " + wkNumber + "-" + paiva + "-poikkeama";
     writeToExcel(arrData, file + ".xlsx");
+  };
+
+  const handleDb = async () => {
+    const response = await axios
+      .post("http://localhost:3001/api/addDate", {
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: { pvm, poikkeama, saldo, selite },
+      })
+      
+      if (response)
+        if (response.status !== 200) {
+          throw new Error("Network response was not ok");
+        }
+        console.log(response);
   };
 
   const handleChange = (event) => {
@@ -98,10 +113,15 @@ function App() {
 
       <form className="App-form">
         <LocalizationProvider dateAdapter={AdapterMoment}>
-          <DatePicker label="PVM" onChange={handleChangeDate} />
+          <DatePicker
+            sx={{ width: 160 }}
+            label="PVM"
+            onChange={handleChangeDate}
+          />
         </LocalizationProvider>
 
         <TextField
+          sx={{ width: 60 }}
           id="outlined-basic"
           label="Poikkeama tunnit"
           variant="outlined"
@@ -111,6 +131,7 @@ function App() {
         />
 
         <TextField
+          sx={{ width: 60 }}
           id="outlined-basic"
           label="Kumulatiiviset tunnit"
           variant="outlined"
@@ -132,9 +153,11 @@ function App() {
 
         <div className="App-button">
           <Button onClick={handleExport}>Vie exceliin</Button>
-          <Button onClick={testServer}>Server - test</Button>
+          <Button onClick={handleDb}>Tallenna kantaan</Button>
+          <Button onClick={testServer}>Serverin Alive - Test</Button>
         </div>
       </form>
+
       {alive && (
         <ConfirmationDialog
           data={alive}

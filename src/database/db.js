@@ -6,9 +6,12 @@ module.exports.DbHandler = () => {
 
   // SQL query to create a table if it doesn't exist
   const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS saldot (
+    CREATE TABLE IF NOT EXISTS ylityo (
         id INTEGER PRIMARY KEY,
-        tunnit INTEGER
+        pvm DATE DEFAULT CURRENT_DATE,
+        poikeama INTEGER DEFAULT 0,
+        saldo INTEGER,
+        selite TEXT default "Support"
     )
 `;
   // Execute the query to create the table
@@ -19,7 +22,7 @@ module.exports.DbHandler = () => {
     console.log("Table created successfully");
 
     // Close the database connection after the table is created
-    //db.close();
+    db.close();
   });
 };
 

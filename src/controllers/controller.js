@@ -15,9 +15,24 @@ const open = () => {
   return db;
 };
 
-exports.AddData = (saldo) => {
+exports.AddWorkException = (pvm, poikkeama, saldo, selite) => {
   const db = open();
-  const insertQuery = `INSERT INTO saldot (tunnit) VALUES (?)`;
+  const insertQuery = `INSERT INTO ylityo (poikkeama) VALUES (?,?,?,?)`;
+  const values = [pvm, poikkeama, saldo, selite];
+
+  db.run(insertQuery, values, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`A record has been inserted with rowid ${this.lastID}`);
+  });
+
+  db.close();
+};
+
+exports.AddSaldo = (saldo) => {
+  const db = open();
+  const insertQuery = `INSERT INTO ylityo (saldo) VALUES (?)`;
   const values = [saldo];
 
   db.run(insertQuery, values, function (err) {
@@ -32,17 +47,14 @@ exports.AddData = (saldo) => {
 
 exports.getData = async (cb) => {
   const db = open();
-  const str = `SELECT tunnit FROM saldot ORDER BY tunnit DESC LIMIT 1`;
+  const str = `SELECT * FROM ylityo`;
   db.all(str, [], (error, rows) => {
-    console.log("getting data or trying");
     if (error) {
       throw error;
     } else {
-      console.log("next forEach");
       rows.forEach((row) => {
         console.log("simulated data");
       });
-      console.log("After forEach");
       cb(null, rows);
     }
   });
@@ -51,3 +63,4 @@ exports.getData = async (cb) => {
 
 exports.getData = this.getData;
 exports.AddData = this.AddData;
+exports.AddWorkException = this.AddWorkException;
