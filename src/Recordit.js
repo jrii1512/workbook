@@ -2,8 +2,10 @@ import React, {useEffect, useState} from 'react'
 
 
 export function Records(props){
-const { rekisteri } = props
-console.log(rekisteri)
+const { tuntilista } = props
+console.log("tuntilista: ", tuntilista)
+const {rekisteri} = tuntilista
+console.log("Records:")
 
     return(
         <table>
@@ -17,8 +19,8 @@ console.log(rekisteri)
           </tr>
         </thead>
 
-        {rekisteri &&
-          rekisteri.map((r) => (
+        {
+          tuntilista && tuntilista.map((r) => (
             <tbody>
               <tr>
                 <td>{r.id}</td>

@@ -127,8 +127,13 @@ function App() {
     if (records.status !== 200) {
       throw new Error("Network response was not ok");
     }
+    console.log("r:", records)
     setRekisteri(records.data);
   };
+
+  rekisteri.map(y => (
+    console.log("rekkari: ", y.id)
+  ))
 
   return (
     <>
@@ -183,7 +188,7 @@ function App() {
           />
         )}
       </div>
-      {rekisteri && <Records tuntilista={rekisteri} />}
+      <Records tuntilista={rekisteri} />
     </>
   );
 }
