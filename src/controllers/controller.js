@@ -15,15 +15,15 @@ const open = () => {
   return db;
 };
 
-exports.AddWorkException = (pvm, poikkeama, saldo, selite) => {
+exports.AddWorkException = (pvm, poikkeama, newSaldo, selite) => {
   //const db = open();
   const db = new sqlite3.Database("./src/database/jrla.db");
   const insertQuery = `INSERT INTO ylityo (pvm, poikkeama, saldo, selite) VALUES (?,?,?,?)`;
-  const values = [pvm, poikkeama, saldo, selite];
+  const values = [pvm, poikkeama, newSaldo, selite];
 
-  let cumSaldo = parseInt(poikkeama) + parseInt(saldo) 
+  //let cumSaldo = parseInt(poikkeama) + parseInt(saldo) 
 
-  db.run(insertQuery, [pvm, poikkeama, cumSaldo, selite], function (err) {
+  db.run(insertQuery, [pvm, poikkeama, newSaldo, selite], function (err) {
     if (err) {
       return console.error(err);
     }

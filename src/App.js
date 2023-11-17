@@ -5,6 +5,7 @@ import ExcelReader from "./ExcelReader";
 import writeToExcel from "./WriteToExcel";
 import { useWk } from "./hooks/utils";
 import "./App.css";
+import {Records} from "./Recordit";
 
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -24,6 +25,7 @@ function App() {
   const [poikkeama, setPoikkeama] = useState(0);
   const [selite, setSelite] = useState("");
   const [alive, setAlive] = useState("");
+  const [rekisteri, setRekisteri] = useState([]);
   const startDay = new Date().getDate();
   const month = new Date().getMonth() + 1;
   const wkNumber = useWk();
@@ -120,56 +122,69 @@ function App() {
     setPVM(newDate);
   };
 
+  const readData = async () => {
+    const records = await axios.get("http://localhost:3001/api/getData");
+    if (records.status !== 200) {
+      throw new Error("Network response was not ok");
+    }
+    setRekisteri(records.data);
+  };
+
   return (
-    <div className="App">
-      <h1 className="App-title">Ylityö kirjaus systeemi</h1>
+    <>
+      <div className="App">
+        <h1 className="App-title">Ylityö kirjaus systeemi</h1>
 
-      <form className="App-form">
-        <h3>Nyt saldo tunteja: {saldo}</h3>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <DatePicker
-            sx={{ width: 160 }}
-            label="PVM"
-            onChange={handleChangeDate}
+        <form className="App-form">
+          <h3>Nyt saldo tunteja: {saldo}</h3>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker
+              sx={{ width: 160 }}
+              label="PVM"
+              onChange={handleChangeDate}
+              value={moment()}
+            />
+          </LocalizationProvider>
+
+          <TextField
+            sx={{ width: 60 }}
+            id="outlined-basic"
+            label="Poikkeama tunnit"
+            variant="outlined"
+            value={parseInt(poikkeama)}
+            name="poikkeama"
+            onChange={handleChange}
           />
-        </LocalizationProvider>
 
-        <TextField
-          sx={{ width: 60 }}
-          id="outlined-basic"
-          label="Poikkeama tunnit"
-          variant="outlined"
-          value={parseInt(poikkeama)}
-          name="poikkeama"
-          onChange={handleChange}
-        />
+          <TextField
+            id="outlined-basic"
+            label="Selite"
+            variant="outlined"
+            value="Support"
+            name="selite"
+            multiline
+            maxRows={5}
+            onChange={handleChange}
+          />
 
-        <TextField
-          id="outlined-basic"
-          label="Selite"
-          variant="outlined"
-          value={selite}
-          name="selite"
-          multiline
-          maxRows={5}
-          onChange={handleChange}
-        />
+          <div className="App-button">
+            <Button onClick={handleExport}>Vie exceliin</Button>
+            <Button onClick={handleDb}>Tallenna kantaan</Button>
+            <Button onClick={readData}>Näytä recordit</Button>
+            <Button onClick={testServer}>Serverin Alive - Test</Button>
+          </div>
+        </form>
 
-        <div className="App-button">
-          <Button onClick={handleExport}>Vie exceliin</Button>
-          <Button onClick={handleDb}>Tallenna kantaan</Button>
-          <Button onClick={testServer}>Serverin Alive - Test</Button>
-        </div>
-      </form>
-
-      {alive && (
-        <ConfirmationDialog
-          data={alive}
-          title="Alive"
-          onClose={() => onDialogClosed()}
-        />
-      )}
-    </div>
+        {alive && (
+          <ConfirmationDialog
+            data={alive}
+            title="Alive"
+            onClose={() => onDialogClosed()}
+          />
+        )}
+      </div>
+      {rekisteri && <Records tuntilista={rekisteri} />}
+    </>
   );
 }
 

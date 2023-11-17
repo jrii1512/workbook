@@ -26,8 +26,8 @@ router.get("/api/getSaldo", async (req, res) => {
   });
 });
 
-/*
-router.get("/api/getSaldo", async (req, res) => {
+
+router.get("/api/getData", async (req, res) => {
   getData((error, data) => {
     if (error) {
       return res.send(error);
@@ -36,13 +36,13 @@ router.get("/api/getSaldo", async (req, res) => {
     return res.json(data);
   });
 });
-*/
+
 
 router.post("/api/addDate", async (req, res) => {
-  const { pvm, poikkeama, saldo, selite } = await req?.body;
-  console.log(pvm, poikkeama, saldo, selite);
+  const { pvm, poikkeama, newSaldo, selite } = await req?.body;
+  console.log(pvm, poikkeama, newSaldo, selite);
 
-  const insertStatus = AddWorkException(pvm, poikkeama, saldo, selite);
+  const insertStatus = AddWorkException(pvm, poikkeama, newSaldo, selite);
   res.sendStatus(insertStatus);
 });
 
