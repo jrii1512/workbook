@@ -1,7 +1,9 @@
+//const bodyParser = require("body-parser");
 const express = require("express");
 const router = express.Router();
 const {
   getData,
+  getSaldo,
   AddWorkException,
   AddData,
 } = require("../controllers/controller");
@@ -15,21 +17,33 @@ router.get("/", (req, res) => {
 });
 
 router.get("/api/getSaldo", async (req, res) => {
+  getSaldo((error, data) => {
+    if (error) {
+      console.log("Error: ");
+    }
+    console.log("data in router/index: ", data);
+    return res.json(data);
+  });
+});
+
+/*
+router.get("/api/getSaldo", async (req, res) => {
   getData((error, data) => {
     if (error) {
       return res.send(error);
     }
-    console.log("data in router/index: ", data[0].tunnit);
-    return res.json(data[0].tunnit);
+    console.log("data in router/index: ", data);
+    return res.json(data);
   });
 });
+*/
 
 router.post("/api/addDate", async (req, res) => {
-  const { pvm, poikkeama, saldo, selite } = req.body;
-  console.log("pvm: ", pvm  + "poikkama ", poikkeama + ', saldo: ' + saldo + ', selite:', selite)
-  
-  const newRecord = AddWorkException(poikkeama, saldo);
-  res.json({ records: newRecord });
+  const { pvm, poikkeama, saldo, selite } = await req?.body;
+  console.log(pvm, poikkeama, saldo, selite);
+
+  const insertStatus = AddWorkException(pvm, poikkeama, saldo, selite);
+  res.sendStatus(insertStatus);
 });
 
 module.exports = router;

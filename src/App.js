@@ -40,6 +40,9 @@ function App() {
         if (response.status !== 200) {
           throw new Error("Network response was not ok");
         }
+        if (!response.data) {
+          response.data = 0;
+        }
         setSaldo(parseInt(response.data));
       });
   }, []);
@@ -61,20 +64,30 @@ function App() {
     writeToExcel(arrData, file + ".xlsx");
   };
 
+  const newSaldo = parseInt(saldo) + parseInt(poikkeama);
+
+  const data = {
+    pvm,
+    poikkeama,
+    newSaldo,
+    selite,
+  };
+
   const handleDb = async () => {
-    const response = await axios
-      .post("http://localhost:3001/api/addDate", {
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: { pvm, poikkeama, saldo, selite },
-      })
-      
-      if (response)
-        if (response.status !== 200) {
-          throw new Error("Network response was not ok");
-        }
-        console.log(response);
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/api/addDate",
+        data,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      if (response.status !== 200) {
+        throw new Error("Network response was not ok");
+      }
+      console.log(response);
+    } catch (err) {
+      console.log("db post requesti meni aivan vituiksi. Err: ", err);
+    }
   };
 
   const handleChange = (event) => {
@@ -85,7 +98,7 @@ function App() {
     );
 
     if (event.target.name === "poikkeama") {
-      setPoikkeama(event.target.value);
+      setPoikkeama(parseInt(event.target.value));
     } else if (event.target.name === "selite") {
       setSelite(event.target.value);
     }
@@ -112,6 +125,7 @@ function App() {
       <h1 className="App-title">Ylityö kirjaus systeemi</h1>
 
       <form className="App-form">
+        <h3>Nyt saldo tunteja: {saldo}</h3>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <DatePicker
             sx={{ width: 160 }}
@@ -127,16 +141,6 @@ function App() {
           variant="outlined"
           value={parseInt(poikkeama)}
           name="poikkeama"
-          onChange={handleChange}
-        />
-
-        <TextField
-          sx={{ width: 60 }}
-          id="outlined-basic"
-          label="Kumulatiiviset tunnit"
-          variant="outlined"
-          value={parseInt(poikkeama) + parseInt(saldo)}
-          name="saldo"
           onChange={handleChange}
         />
 
