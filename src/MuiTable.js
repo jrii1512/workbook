@@ -1,55 +1,67 @@
 import * as React from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 100 },
+  {
+    field: "id",
+    headerName: "ID",
+    width: 100,
+    valueGetter: (params) => `${params.row.id}`,
+  },
   { field: "pvm", headerName: "PVM", width: 100, sortable: true },
   { field: "poikkeama", headerName: "Poikkeama", width: 100 },
   { field: "saldo", headerName: "Saldo", width: 100 },
   { field: "selite", headerName: "Selite", width: 400 },
-
-  /*
-  {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params) =>
-      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-  },
-  */
 ];
-
-/*
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-];
-*/
 
 export default function DataTable(props) {
   console.log("props: ", props);
-  const { rows } = props
+  const { rows } = props;
+
+  const [selectedRows, setSelectedRows] = React.useState([]);
+
+  const getCellValue = React.useCallback((params) => {
+    // Access the value of the cell using the field name
+    console.log("id = ", params.id);
+    return params.getValue(params.id, params.id);
+  }, []);
+
+  const apiRef = useGridApiRef();
+
+  const onRowEditCommit = (id, event) => {
+    console.log("onRowEditCommit");
+    const rowid = apiRef.getRow();
+    console.log("rivi:", rowid);
+  };
+
+  const deleteRow = (params) => {
+    console.log(params.id);
+  };
+
+  const handleSelectionModelChange = (selectionModel) => {
+    console.log("handleSelectionModel");
+    // 'selectionModel' is an array of selected row IDs
+    setSelectedRows(selectionModel);
+  };
+
   return (
     <div style={{ height: 400, width: "100%" }}>
       <DataGrid
         rows={rows}
         columns={columns}
+        //apiRef
         initialState={{
           pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
+            paginationModel: { page: 0, pageSize: 10 },
           },
         }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
+        //editable={true}
+        //editMode="row"
+
+        autoHeight={true}
+        onRowClick={(params) => deleteRow(params)}
       />
     </div>
   );

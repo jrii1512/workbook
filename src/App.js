@@ -50,6 +50,15 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    axios.get("http://localhost:3001/api/getData").then((response) => {
+      if (response.status !== 200) {
+        throw new Error("Network response was not ok");
+      }
+      setRekisteri(response.data);
+    });
+  }, [readToggle]);
+
   const arrData = [
     [],
     [],
@@ -123,16 +132,10 @@ function App() {
     setPVM(newDate);
   };
 
-  const readData = async () => {
+  const showRecordsToggle = () => {
+    console.log("readToggle arvo = ", readToggle);
     setReadToggle(!readToggle);
-    if (readToggle) {
-      const records = await axios.get("http://localhost:3001/api/getData");
-      if (records.status !== 200) {
-        throw new Error("Network response was not ok");
-      }
-      console.log("r:", records);
-      setRekisteri(records.data);
-    } 
+    console.log("readToggle arvo = ", readToggle);
   };
 
   rekisteri.map((y) => console.log("rekkari: ", y.id));
@@ -178,7 +181,7 @@ function App() {
             <div className="App-button">
               <Button onClick={handleExport}>Vie exceliin</Button>
               <Button onClick={handleDb}>Tallenna kantaan</Button>
-              <Button onClick={readData}>Näytä recordit</Button>
+              <Button onClick={showRecordsToggle}>Näytä recordit</Button>
               <Button onClick={testServer}>Serverin Alive - Test</Button>
             </div>
           </form>
