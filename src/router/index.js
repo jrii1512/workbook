@@ -6,6 +6,7 @@ const {
   getSaldo,
   AddWorkException,
   AddData,
+  deleteRecord
 } = require("../controllers/controller");
 
 router.get("/alive", (req, res) => {
@@ -44,6 +45,14 @@ router.post("/api/addDate", async (req, res) => {
 
   const insertStatus = AddWorkException(pvm, poikkeama, newSaldo, selite);
   res.sendStatus(insertStatus);
+});
+
+router.delete("/api/delete", async (req, res) => {
+   console.log(req.body)
+  const { params } = await req?.body;
+  console.log("params: ", params)
+  const delResponse = deleteRecord(params.id);
+  res.sendStatus(delResponse);
 });
 
 module.exports = router;

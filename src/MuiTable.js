@@ -1,5 +1,7 @@
 import * as React from "react";
+import axios from 'axios'
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const columns = [
   {
@@ -34,8 +36,23 @@ export default function DataTable(props) {
     console.log("rivi:", rowid);
   };
 
-  const deleteRow = (params) => {
+  const deleteRow = async (params) => {
     console.log(params.id);
+    if (window.confirm(`Recordi ${params.id} tuhotaan, really?`)) {
+      try {
+        const response = await axios.delete(
+          "http://localhost:3001/api/delete/"+
+          params.id
+        );
+        if (response.status === 201) {
+          console.log(`Record ${params.id} tuhottu`);
+        } else {
+          console.log("Recordin tuhoaminen epäonnistui");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   const handleSelectionModelChange = (selectionModel) => {

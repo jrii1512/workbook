@@ -21,7 +21,7 @@ exports.AddWorkException = (pvm, poikkeama, newSaldo, selite) => {
   const insertQuery = `INSERT INTO ylityo (pvm, poikkeama, saldo, selite) VALUES (?,?,?,?)`;
   const values = [pvm, poikkeama, newSaldo, selite];
 
-  //let cumSaldo = parseInt(poikkeama) + parseInt(saldo) 
+  //let cumSaldo = parseInt(poikkeama) + parseInt(saldo)
 
   db.run(insertQuery, [pvm, poikkeama, newSaldo, selite], function (err) {
     if (err) {
@@ -81,7 +81,24 @@ exports.getData = async (cb) => {
   db.close();
 };
 
+exports.deleleRecord = (id) => {
+  console.log("deleteRecord")
+  const db = open();
+  const str = `DELETE FROM ylityo WHERE id = ` + parseInt(id);
+
+  db.run(str, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`A record ${id} was deleted`);
+  });
+
+  db.close();
+  return 201;
+};
+
 exports.getData = this.getData;
 exports.getSaldo = this.getSaldo;
 exports.AddData = this.AddData;
+exports.deleleRecord = this.deleleRecord;
 exports.AddWorkException = this.AddWorkException;

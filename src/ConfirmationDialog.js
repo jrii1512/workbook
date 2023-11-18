@@ -11,7 +11,7 @@ import {
 const ConfirmationDialog = (props) => {
   const {data, title, onClose} = props;
   
-  return (
+  return (  
     <Dialog open={true}>
       <DialogTitle></DialogTitle>
       <DialogContent>
