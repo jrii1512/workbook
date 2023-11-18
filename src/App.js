@@ -5,7 +5,6 @@ import ExcelReader from "./ExcelReader";
 import writeToExcel from "./WriteToExcel";
 import { useWk } from "./hooks/utils";
 import "./App.css";
-import {Records} from "./Recordit";
 
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -15,11 +14,13 @@ import moment from "moment";
 
 import { useConfirm } from "material-ui-confirm";
 import ConfirmationDialog from "./ConfirmationDialog";
+import MuiTable from "./MuiTable";
 
 function App() {
   /*<ExcelReader />*/
 
   let file = "";
+  const [readToggle, setReadToggle] = useState(false);
   const [pvm, setPVM] = useState("");
   const [saldo, setSaldo] = useState(0);
   const [poikkeama, setPoikkeama] = useState(0);
@@ -123,62 +124,65 @@ function App() {
   };
 
   const readData = async () => {
-    const records = await axios.get("http://localhost:3001/api/getData");
-    if (records.status !== 200) {
-      throw new Error("Network response was not ok");
-    }
-    console.log("r:", records)
-    setRekisteri(records.data);
+    setReadToggle(!readToggle);
+    if (readToggle) {
+      const records = await axios.get("http://localhost:3001/api/getData");
+      if (records.status !== 200) {
+        throw new Error("Network response was not ok");
+      }
+      console.log("r:", records);
+      setRekisteri(records.data);
+    } 
   };
 
-  rekisteri.map(y => (
-    console.log("rekkari: ", y.id)
-  ))
+  rekisteri.map((y) => console.log("rekkari: ", y.id));
 
   return (
     <>
       <div className="App">
         <h1 className="App-title">Ylityö kirjaus systeemi</h1>
 
-        <form className="App-form">
-          <h3>Nyt saldo tunteja: {saldo}</h3>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker
-              sx={{ width: 160 }}
-              label="PVM"
-              onChange={handleChangeDate}
-              value={moment()}
+        {!readToggle && (
+          <form className="App-form">
+            <h3>Nyt saldo tunteja: {saldo}</h3>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                sx={{ width: 160 }}
+                label="PVM"
+                onChange={handleChangeDate}
+                value={moment()}
+              />
+            </LocalizationProvider>
+
+            <TextField
+              sx={{ width: 60 }}
+              id="outlined-basic"
+              label="Poikkeama tunnit"
+              variant="outlined"
+              value={parseInt(poikkeama)}
+              name="poikkeama"
+              onChange={handleChange}
             />
-          </LocalizationProvider>
 
-          <TextField
-            sx={{ width: 60 }}
-            id="outlined-basic"
-            label="Poikkeama tunnit"
-            variant="outlined"
-            value={parseInt(poikkeama)}
-            name="poikkeama"
-            onChange={handleChange}
-          />
+            <TextField
+              id="outlined-basic"
+              label="Selite"
+              variant="outlined"
+              value="Support"
+              name="selite"
+              multiline
+              maxRows={5}
+              onChange={handleChange}
+            />
 
-          <TextField
-            id="outlined-basic"
-            label="Selite"
-            variant="outlined"
-            value="Support"
-            name="selite"
-            multiline
-            maxRows={5}
-            onChange={handleChange}
-          />
-
-          <div className="App-button">
-            <Button onClick={handleExport}>Vie exceliin</Button>
-            <Button onClick={handleDb}>Tallenna kantaan</Button>
-            <Button onClick={readData}>Näytä recordit</Button>
-            <Button onClick={testServer}>Serverin Alive - Test</Button>
-          </div>
-        </form>
+            <div className="App-button">
+              <Button onClick={handleExport}>Vie exceliin</Button>
+              <Button onClick={handleDb}>Tallenna kantaan</Button>
+              <Button onClick={readData}>Näytä recordit</Button>
+              <Button onClick={testServer}>Serverin Alive - Test</Button>
+            </div>
+          </form>
+        )}
 
         {alive && (
           <ConfirmationDialog
@@ -188,7 +192,7 @@ function App() {
           />
         )}
       </div>
-      <Records tuntilista={rekisteri} />
+      {readToggle && <MuiTable rows={rekisteri} />}
     </>
   );
 }
