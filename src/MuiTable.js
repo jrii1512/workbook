@@ -2,7 +2,9 @@ import * as React from "react";
 import axios from "axios";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import ConfirmationDialog from "./ConfirmationDialog";
-
+import writeToExcel from "./WriteToExcel";
+import { useWk } from "./hooks/utils";
+import { Button } from "@mui/material";
 
 const columns = [
   {
@@ -19,9 +21,11 @@ const columns = [
 
 export default function DataTable(props) {
   console.log("props: ", props);
+  const dataGridRef = React.useRef();
   const { rows } = props;
   const [reload, setReload] = React.useState(false);
-
+  const wkNumber = useWk();
+  const [tuho, setTuho] = React.useState(false);
   const [selectedRows, setSelectedRows] = React.useState([]);
 
   const getCellValue = React.useCallback((params) => {
@@ -38,6 +42,15 @@ export default function DataTable(props) {
     console.log("rivi:", rowid);
   };
 
+  const handleExport = () => {
+    let newRows = [];
+    newRows.push(rows);
+    console.log("Excel rows:", newRows);
+    let paiva = new Date().getDate();
+    let file = "Vk " + wkNumber + "-" + paiva + "-poikkeama";
+    writeToExcel(newRows, file + ".xlsx");
+  };
+
   const deleteRow = async (params) => {
     console.log("Delete row funkkari, tuhottava id ", params.id);
     if (window.confirm(`Recordi ${params.id} tuhotaan, really?`)) {
@@ -47,8 +60,11 @@ export default function DataTable(props) {
         );
         if (response.status === 201) {
           console.log(`Record ${params.id} tuhottu`);
-          props.refreshRows(params.id)
-          
+          props.refreshRows(params.id);
+          setTuho(true);
+
+          //window.location.reload(true);
+          //dataGridRef.current.api.forceUpdate();
         } else {
           console.log("Recordin tuhoaminen epäonnistui");
         }
@@ -56,6 +72,10 @@ export default function DataTable(props) {
         console.log(err);
       }
     }
+  };
+
+  const onDialogClose = () => {
+    setTuho(false);
   };
 
   const handleSelectionModelChange = (selectionModel) => {
@@ -83,6 +103,14 @@ export default function DataTable(props) {
         autoHeight={true}
         onRowClick={(params) => deleteRow(params)}
       />
+      {rows.length > 1 && <Button onClick={handleExport}>Vie exceliin</Button>}
+      {tuho && (
+        <ConfirmationDialog
+          data="Recordi tuhottu"
+          title="Tuho"
+          onClose={() => onDialogClose()}
+        />
+      )}
     </div>
   );
 }

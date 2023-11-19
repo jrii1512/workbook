@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ExcelReader from "./ExcelReader";
-import writeToExcel from "./WriteToExcel";
+
 import { useWk } from "./hooks/utils";
 import "./App.css";
 
@@ -67,6 +67,7 @@ function App() {
     }
   }, [readToggle]);
 
+  /*
   const arrData = [
     [],
     [],
@@ -76,15 +77,13 @@ function App() {
     [],
     ["Työtehtävät, selite poikeamalle: " + selite],
   ];
+  */
 
   const confirm = useConfirm();
-  const handleExport = () => {
-    let paiva = new Date().getDate();
-    file = "Vk " + wkNumber + "-" + paiva + "-poikkeama";
-    writeToExcel(arrData, file + ".xlsx");
-  };
 
+  console.log("saldo: ", saldo + ", poikkeama: ", poikkeama)
   const newSaldo = parseInt(saldo) + parseInt(poikkeama);
+  console.log("Uusi saldo: ", newSaldo)
 
   const data = {
     pvm,
@@ -101,7 +100,7 @@ function App() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (response.status !== 200) {
+      if (response.status !== 201) {
         throw new Error("Network response was not ok");
       }
       console.log(response);
@@ -148,13 +147,19 @@ function App() {
 
   rekisteri.map((y) => console.log("rekkari: ", y.id));
 
+  //Child component MuiTable delete functions use this.
   const reloadRows = (id) => {
-    console.log("Update rows by removing id: ", id);
+    console.log(
+      "Update rows by filterin id and resetting new array to the state. ",
+      id
+    );
     const idToBeRemoved = rekisteri.find((item) => item.id === id);
 
     if (idToBeRemoved) {
       const uusiRekkari = rekisteri.filter((item) => item !== id);
+      console.log("Resetting rekkari array");
       setRekisteri(uusiRekkari);
+      setReadToggle(true);
     } else {
       console.log("Taulussa ei ollut poistettavaa id:eetä");
     }
@@ -198,7 +203,6 @@ function App() {
             />
 
             <div className="App-button">
-              <Button onClick={handleExport}>Vie exceliin</Button>
               <Button onClick={handleDb}>Tallenna kantaan</Button>
               <Button onClick={showRecordsToggle}>Näytä recordit</Button>
               <Button onClick={testServer}>Serverin Alive - Test</Button>
@@ -214,7 +218,9 @@ function App() {
           />
         )}
       </div>
-      {readToggle && <MuiTable rows={rekisteri} refreshRows={reloadRows} />}
+      {rekisteri.length > 1 && (
+        <MuiTable rows={rekisteri} refreshRows={reloadRows} />
+      )}
     </>
   );
 }
