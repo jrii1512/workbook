@@ -57,8 +57,8 @@ exports.getSaldo = async (cb) => {
     if (error) {
       throw error;
     } else {
-      console.log("data: ", data.saldo);
-      cb(null, data.saldo);
+      console.log("data: ", data?.saldo);
+      cb(null, data?.saldo);
     }
   });
 
@@ -81,7 +81,7 @@ exports.getData = async (cb) => {
   db.close();
 };
 
-exports.deleleRecord = (id) => {
+exports.deleteRecord = (id) => {
   console.log("deleteRecord")
   const db = open();
   const str = `DELETE FROM ylityo WHERE id = ` + parseInt(id);

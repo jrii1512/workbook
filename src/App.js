@@ -32,31 +32,39 @@ function App() {
   const wkNumber = useWk();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/api/getSaldo", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("response: ", response);
-        if (response.status !== 200) {
-          throw new Error("Network response was not ok");
-        }
-        if (!response.data) {
-          response.data = 0;
-        }
-        setSaldo(parseInt(response.data));
-      });
+    try {
+      axios
+        .get("http://localhost:3001/api/getSaldo", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          console.log("response: ", response);
+          if (response.status !== 200) {
+            throw new Error(`getSaldo response ${response.status}`);
+          }
+          if (!response.data) {
+            response.data = 0;
+          }
+          setSaldo(parseInt(response.data));
+        });
+    } catch (err) {
+      console.error(`getSaldo error ${err.response} ${err.message}`);
+    }
   }, []);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/api/getData").then((response) => {
-      if (response.status !== 200) {
-        throw new Error("Network response was not ok");
-      }
-      setRekisteri(response.data);
-    });
+    try {
+      axios.get("http://localhost:3001/api/getData").then((response) => {
+        if (response.status !== 200) {
+          throw new Error(`getData response ${response.status}`);
+        }
+        setRekisteri(response.data);
+      });
+    } catch (err) {
+      console.error(`getData catch error ${err.message}`);
+    }
   }, [readToggle]);
 
   const arrData = [
@@ -140,6 +148,17 @@ function App() {
 
   rekisteri.map((y) => console.log("rekkari: ", y.id));
 
+  const reloadRows = (id) => {
+    console.log("Update rows by removing id: ", id);
+    const idToBeRemoved = rekisteri.find((item) => item.id === id);
+
+    if (idToBeRemoved) {
+      const uusiRekkari = rekisteri.filter((item) => item !== id);
+      setRekisteri(uusiRekkari);
+    } else {
+      console.log("Taulussa ei ollut poistettavaa id:eetä");
+    }
+  };
   return (
     <>
       <div className="App">
@@ -195,7 +214,7 @@ function App() {
           />
         )}
       </div>
-      {readToggle && <MuiTable rows={rekisteri} />}
+      {readToggle && <MuiTable rows={rekisteri} refreshRows={reloadRows} />}
     </>
   );
 }

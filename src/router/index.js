@@ -1,4 +1,3 @@
-//const bodyParser = require("body-parser");
 const express = require("express");
 const router = express.Router();
 const {
@@ -6,7 +5,7 @@ const {
   getSaldo,
   AddWorkException,
   AddData,
-  deleteRecord
+  deleteRecord,
 } = require("../controllers/controller");
 
 router.get("/alive", (req, res) => {
@@ -27,7 +26,6 @@ router.get("/api/getSaldo", async (req, res) => {
   });
 });
 
-
 router.get("/api/getData", async (req, res) => {
   getData((error, data) => {
     if (error) {
@@ -38,7 +36,6 @@ router.get("/api/getData", async (req, res) => {
   });
 });
 
-
 router.post("/api/addDate", async (req, res) => {
   const { pvm, poikkeama, newSaldo, selite } = await req?.body;
   console.log(pvm, poikkeama, newSaldo, selite);
@@ -47,11 +44,11 @@ router.post("/api/addDate", async (req, res) => {
   res.sendStatus(insertStatus);
 });
 
-router.delete("/api/delete", async (req, res) => {
-   console.log(req.body)
-  const { params } = await req?.body;
-  console.log("params: ", params)
-  const delResponse = deleteRecord(params.id);
+router.delete("/api/delete/:id", async (req, res) => {
+  console.log("router.index -- delete");
+
+  const { id } = await req?.params;
+  const delResponse = deleteRecord(parseInt(id));
   res.sendStatus(delResponse);
 });
 
