@@ -44,11 +44,11 @@ export default function DataTable(props) {
 
   const handleExport = () => {
     let newRows = [];
-    newRows.push(rows);
-    console.log("Excel rows:", newRows);
+    //newRows.push(rows);
+    //console.log("Excel rows:", newRows);
     let paiva = new Date().getDate();
     let file = "Vk " + wkNumber + "-" + paiva + "-poikkeama";
-    writeToExcel(newRows, file + ".xlsx");
+    writeToExcel(rows, file + ".xlsx");
   };
 
   const deleteRow = async (params) => {
@@ -85,10 +85,20 @@ export default function DataTable(props) {
   };
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
+    <div
+      style={{
+        height: 400,
+        width: 800,
+        display: "flex",
+        justifyContent: "center",
+        alignitems: "center",
+      }}
+    >
       <DataGrid
+        sx={{ m: 2 }}
         rows={rows}
         columns={columns}
+        autoHeight={true}
         //apiRef
         initialState={{
           pagination: {
@@ -99,11 +109,16 @@ export default function DataTable(props) {
         checkboxSelection
         //editable={true}
         //editMode="row"
-
-        autoHeight={true}
         onRowClick={(params) => deleteRow(params)}
       />
-      {rows.length > 1 && <Button onClick={handleExport}>Vie exceliin</Button>}
+      {rows.length > 1 && (
+        <Button
+          style={{ marginTop: 500, marginLeft: -100 }}
+          onClick={handleExport}
+        >
+          Vie exceliin
+        </Button>
+      )}
       {tuho && (
         <ConfirmationDialog
           data="Recordi tuhottu"

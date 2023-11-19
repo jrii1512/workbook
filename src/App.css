@@ -30,6 +30,12 @@
   margin-top:0px;
 }
 
+.datagrid{
+  display: "flex";
+  justifyContent: "center";
+  alignItems: "center";
+}
+
 Box {
   gap:10px;
 }

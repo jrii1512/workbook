@@ -218,8 +218,9 @@ function App() {
           />
         )}
       </div>
-      {rekisteri.length > 1 && (
-        <MuiTable rows={rekisteri} refreshRows={reloadRows} />
+      {readToggle &&  rekisteri.length > 1 && (
+        <MuiTable getRowClassName={(params) =>
+          params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'} rows={rekisteri} refreshRows={reloadRows} />
       )}
     </>
   );
