@@ -85,47 +85,48 @@ export default function DataTable(props) {
   };
 
   return (
-    <div
-      style={{
-        height: 400,
-        width: 800,
-        display: "flex",
-        justifyContent: "center",
-        alignitems: "center",
-      }}
-    >
-      <DataGrid
-        sx={{ m: 2 }}
-        rows={rows}
-        columns={columns}
-        autoHeight={true}
-        //apiRef
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
-          },
+    <>
+      <div
+        style={{
+          display: "grid",
+          placeItems: "center",
+          height: "100vh",
+          marginTop: 0,
         }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        //editable={true}
-        //editMode="row"
-        onRowClick={(params) => deleteRow(params)}
-      />
-      {rows.length > 1 && (
-        <Button
-          style={{ marginTop: 500, marginLeft: -100 }}
-          onClick={handleExport}
-        >
-          Vie exceliin
-        </Button>
-      )}
-      {tuho && (
-        <ConfirmationDialog
-          data="Recordi tuhottu"
-          title="Tuho"
-          onClose={() => onDialogClose()}
+      >
+        <div style={{ marginTop: 0, marginLeft: -550 }}>
+          <Button onClick={handleExport}>Vie exceliin</Button>
+          <Button onClick={() => window.location.reload()}>
+            Syöttö lomakkeeseen
+          </Button>
+        </div>
+
+        <DataGrid
+          sx={{ m: 2 }}
+          rows={rows}
+          columns={columns}
+          autoHeight={true}
+          //apiRef
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          editable={true}
+          editMode="row"
+          onRowClick={(params) => deleteRow(params)}
         />
-      )}
-    </div>
+
+        {tuho && (
+          <ConfirmationDialog
+            data="Recordi tuhottu"
+            title="Tuho"
+            onClose={() => onDialogClose()}
+          />
+        )}
+      </div>
+    </>
   );
 }

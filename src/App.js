@@ -167,8 +167,8 @@ function App() {
   return (
     <>
       <div className="App">
-        <h1 className="App-title">Ylityö kirjaus systeemi</h1>
-
+        {!readToggle && <h1 className="App-title">Ylityö kirjaus systeemi</h1>}
+        {!readToggle &&<h5>Listaus tietokannassa olevista päivittäisistä yli / ali tunneista. </h5>}
         {!readToggle && (
           <form className="App-form">
             <h3>Nyt saldo tunteja: {saldo}</h3>
